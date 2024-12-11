@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flavor Wheel Sunburst</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        svg {
+            width: 100%;
+            height: 500px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Flavor Wheel Sunburst Diagram</h1>
+    <div id="chart"></div>
+
+    <script>
+        // Fetch data from the GraphQL endpoint
+        async function fetchFlavorWheelData() {
+            const response = await fetch("http://localhost:8082/graphql", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    query: `{
+                        getFlavorWheel(ingredient: "Egg") {
+                            coreIngredient
+                            categories {
+                                name
+                                similarIngredients
+                            }
+                        }
+                    }`
+                })
+            });
+            const result = await response.json();
+            return result.data.getFlavorWheel;
+        }
+
+        // D3 Sunburst function to render the chart
+        function drawSunburst(data) {
+            const width = 500;
+            const radius = width / 2;
+
+            const root = d3.hierarchy(data)
+                .sum(d => d.children ? 0 : 1)
+                .sort((a, b) => b.value - a.value);
+
+            const partition = d3.partition()
+                .size([2 * Math.PI, radius]);
+
+            partition(root);
+
+            const arc = d3.arc()
+                .startAngle(d => d.x0)
+                .endAngle(d => d.x1)
+                .innerRadius(d => d.y0)
+                .outerRadius(d => d.y1);
+
+            const svg = d3.select("#chart")
+                .append("svg")
+                .attr("viewBox", `0 0 ${width} ${width}`)
+                .append("g")
+                .attr("transform", `translate(${radius},${radius})`);
+
+            svg.selectAll("path")
+                .data(root.descendants())
+                .enter().append("path")
+                .attr("d", arc)
+                .style("fill", d => d.depth ? d3.interpolateRainbow(d.x0 / 2 / Math.PI) : "#fff")
+                .style("stroke", "#fff");
+
+            svg.selectAll("text")
+                .data(root.descendants().filter(d => d.depth))
+                .enter().append("text")
+                .attr("transform", d => {
+                    const angle = (d.x0 + d.x1) / 2 * 180 / Math.PI;
+                    return `rotate(${angle - 90}) translate(${(d.y0 + d.y1) / 2},0)`;
+                })
+                .attr("dx", "-1.5em")
+                .attr("dy", ".35em")
+                .text(d => d.data.name);
+        }
+
+        // Convert the data to the hierarchical structure required by D3
+        function transformData(flavorWheel) {
+            return {
+                name: flavorWheel.coreIngredient,
+                children: flavorWheel.categories.map(category => ({
+                    name: category.name,
+                    children: category.similarIngredients.map(ingredient => ({ name: ingredient }))
+                }))
+            };
+        }
+
+        // Fetch and render the chart
+        fetchFlavorWheelData().then(data => {
+            const transformedData = transformData(data);
+            drawSunburst(transformedData);
+        });
+    </script>
+</body>
+</html>

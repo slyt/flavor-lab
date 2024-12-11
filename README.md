@@ -2,6 +2,17 @@
 
 An application for finding interesting ingredient pairings and creating new recipes.
 
+### Setup
+
+```sh
+python -m venv env
+source env/Scripts/activate
+pip install -r requirements.txt
+
+uvicorn main:app --reload --port 8082
+```
+
+
 ## Datasources
 
 - [Volatile Compounds in Food (VCF)](https://www.vcf-online.nl/VcfCompounds.cfm): The database used to create the Flavor Matrix book.

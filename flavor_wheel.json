@@ -1,0 +1,57 @@
+{
+    "core_ingredient": "Egg",
+    "categories": {
+        "Dairy": {
+            "similar_ingredients": [
+                "yogurt",
+                "sour cream",
+                "milk cream",
+                "butter"
+            ]
+        },
+        "Green": {
+            "similar_ingredients": [
+                "lettuce",
+                "celery",
+                "cabbage",
+                "spinach"
+            ]
+        },
+        "Herbs": {
+            "similar_ingredients": [
+                "parsley",
+                "dill",
+                "mint"
+            ]
+        },
+        "Meaty": {
+            "similar_ingredients": [
+                "pork",
+                "chicken",
+                "turkey",
+                "beef"
+            ]
+        },
+        "Nutty": {
+            "similar_ingredients": [
+                "almond",
+                "peanut",
+                "hazelnut"
+            ]
+        },
+        "Savory": {
+            "similar_ingredients": [
+                "soy sauce",
+                "miso",
+                "anchovy"
+            ]
+        },
+        "Vegetal": {
+            "similar_ingredients": [
+                "potato",
+                "mushroom",
+                "wild rice"
+            ]
+        }
+    }
+}
